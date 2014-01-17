@@ -18,6 +18,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Label Grid.Column="4" HorizontalAlignment="Left">ViewModel Requested</Label>
@@ -50,5 +51,8 @@
         <TextBlock Grid.Row="2" Grid.Column="4" VerticalAlignment="Center" Text="{Binding RequestedPan, StringFormat={}{0:N2}}"/>
         <TextBlock Grid.Row="2" Grid.Column="6" VerticalAlignment="Center" Text="{Binding Model.LastRequestedSettings.Pan, StringFormat={}{0:N2}}"/>
         <TextBlock Grid.Row="2" Grid.Column="8" VerticalAlignment="Center" Text="{Binding Model.CurrentSettings.Pan, StringFormat={}{0:N2}}"/>
+        
+        <Button Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" Content="Reset Pan"
+                Command="{Binding ResetPanCommand}"/>
     </Grid>
 </Window>

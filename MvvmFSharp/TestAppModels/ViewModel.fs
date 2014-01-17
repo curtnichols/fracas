@@ -7,8 +7,16 @@ type ViewModel(model: Model) as x =
     let requestedPan = x.MakeField(<@ x.RequestedPan @>, model.CurrentSettings.Pan)
     let isVolumeConstrained = x.MakeField<bool>(<@ x.IsVolumeConstrained @>)
 
-    member x.Model
-        with get() = model
+    let resetPanCommand = x.MakeCommand<float>((fun value -> 
+                                                    match value with
+                                                    | Some pan when pan = 0.0 -> false
+                                                    | Some pan -> true
+                                                    | None -> false),
+                                               (fun _ -> x.RequestedPan <- 0.0))
+
+    member x.Model with get() = model
+
+    member x.ResetPanCommand with get() = resetPanCommand.ICommand
 
     member x.IsVolumeConstrained
         with get() = isVolumeConstrained.Value
