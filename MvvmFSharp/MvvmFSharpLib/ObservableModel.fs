@@ -44,5 +44,9 @@ and FieldBacker<'T>(om: ObservableBase, propertyExpr) =
             om.NotifyPropertyChanged(propertyName)
             true
 
+    member x.Value
+        with get() = value
+        and set newValue = setValue newValue |> ignore
 
+    /// Sets the value; use when a return value is required to determine if the value has changed.
     member x.Set newValue = set newValue

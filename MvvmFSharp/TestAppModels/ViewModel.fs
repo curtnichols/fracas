@@ -1,18 +1,18 @@
 ﻿namespace TestAppModels
 
-type ViewModel(model: Model) =
+type ViewModel(model: Model) as x =
     inherit MvvmFSharpLib.ObservableBase()
 
     let mutable volume: float = model.CurrentSettings.Volume
     let mutable pan: float = model.CurrentSettings.Pan
-    let mutable isVolumeConstrained: bool = false
+    let isVolumeConstrained = x.MakeField<bool>(<@ x.IsVolumeConstrained @>)
 
     member x.Model
         with get() = model
 
     member x.IsVolumeConstrained
-        with get() = isVolumeConstrained
-        and private set newValue = x.setProperty(&isVolumeConstrained, newValue, <@ x.IsVolumeConstrained @>) |> ignore
+        with get() = isVolumeConstrained.Value
+        and private set newValue = isVolumeConstrained.Value <- newValue
 
     member x.RequestedVolume
         with get() = volume
