@@ -38,5 +38,5 @@ type ViewModel(model: Model) as x =
         and set newValue =
             if requestedPan.Set newValue then
                 match model.ApplySettings {model.LastRequestedSettings with Pan = newValue} with
-                | AudioSettingsAsIs s | AudioSettingsConstrained(s) -> ()
+                | AudioSettingsAsIs s | AudioSettingsConstrained s -> ()
                 | Error msg -> ()

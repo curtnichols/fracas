@@ -39,7 +39,7 @@ type Model(volume: float, pan: float) as x =
         | _ ->
             let constrained = Model.constrain settings
             match constrained with
-            | AudioSettingsAsIs s | AudioSettingsConstrained(s) ->
+            | AudioSettingsAsIs s | AudioSettingsConstrained s ->
                 let delayedApplicationSimulation =
                     async {
                         // Not real-world code: these updates can be out-of-sequence.
