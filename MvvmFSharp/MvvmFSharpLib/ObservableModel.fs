@@ -14,6 +14,13 @@ type ObservableBase() =
         [<CLIEvent>]
         member x.PropertyChanged = propertyChanged.Publish
 
+    member x.MakeField<'T>(propertyExpr) = // TODO would rather have protected mfunc or func
+        new FieldBacker<'T>(x, propertyExpr)
+
+    // Used by FieldBacker
+    member internal x.NotifyPropertyChanged(propertyName) =
+        propertyChanged.Trigger(x, PropertyChangedEventArgs(propertyName))
+
     member x.setProperty<'T>(field: 'T byref, newValue: 'T, propertyExpr) =
         match propertyExpr with
         | PropertyGet(_, propOrValInfo, _) ->
@@ -23,3 +30,19 @@ type ObservableBase() =
                 propertyChanged.Trigger(x, PropertyChangedEventArgs(propOrValInfo.Name))
                 true
         | _ -> failwith "Unexpected expression type; needs PropertyGet"
+
+and FieldBacker<'T>(om: ObservableBase, propertyExpr) =
+    let mutable value = Unchecked.defaultof<'T>
+    let propertyName = 
+        match propertyExpr with
+        | PropertyGet(_, propOrValInfo, _) -> propOrValInfo.Name
+        | _ -> failwith "Unexpected expression type; needs PropertyGet"
+    let setValue newValue =
+        if Object.Equals(value, newValue) then false
+        else 
+            value <- newValue
+            om.NotifyPropertyChanged(propertyName)
+            true
+
+
+    member x.Set newValue = set newValue
