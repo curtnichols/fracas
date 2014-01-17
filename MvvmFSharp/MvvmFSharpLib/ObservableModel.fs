@@ -25,6 +25,7 @@ type ObservableBase() =
     member internal x.NotifyPropertyChanged(propertyName) =
         propertyChanged.Trigger(x, PropertyChangedEventArgs(propertyName))
 
+// Backs fields that cause updates in ObservableModel.
 and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
     let mutable value = match initialValue with
                         | Some t -> t
@@ -51,6 +52,7 @@ and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
 
     member internal x.Updated = internalUpdateEvent.Publish // For internal clients like CommandBacker
 
+/// Backs commands; note that the handlers take 'T option so use your pattern matching.
 and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
                       executeHandler: 'T option -> unit,
                       notifyOnFieldUpdate: FieldBacker<'T> option) as x =
