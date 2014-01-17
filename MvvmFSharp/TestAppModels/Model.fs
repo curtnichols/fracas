@@ -35,11 +35,11 @@ type Model(volume: float, pan: float) as x =
 
     member x.ApplySettings (settings: AudioSettings) =
         match settings.Validate() with
-        | ValidationResult.Error(msg) -> Error(msg)
+        | ValidationResult.Error msg -> Error(msg)
         | _ ->
             let constrained = Model.constrain settings
             match constrained with
-            | AudioSettingsAsIs(s) | AudioSettingsConstrained(s) ->
+            | AudioSettingsAsIs s | AudioSettingsConstrained(s) ->
                 let delayedApplicationSimulation =
                     async {
                         // Not real-world code: these updates can be out-of-sequence.
@@ -48,7 +48,7 @@ type Model(volume: float, pan: float) as x =
                     }
                 delayedApplicationSimulation |> Async.Start
                 x.LastRequestedSettings <- s
-            | Error(desc) -> ()
+            | Error desc -> ()
             constrained
 
     static member constrain settings =
