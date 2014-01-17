@@ -22,14 +22,14 @@ type Model(volume: float, pan: float) as x =
     inherit MvvmFSharpLib.ObservableBase()
 
     let currentSettings = x.MakeField(<@ x.CurrentSettings @>, { Volume = volume; Pan = pan })
-    let requestedSettings = x.MakeField(<@ x.LastRequestedSettings @>, { Volume = volume; Pan = pan })
+    let lastRequestedSettings = x.MakeField(<@ x.LastRequestedSettings @>, { Volume = volume; Pan = pan })
     
     member x.CurrentSettings
         with get() = currentSettings.Value
         and set newValue = currentSettings.Value <- newValue
     member x.LastRequestedSettings
-        with get() = requestedSettings.Value
-        and set newValue = requestedSettings.Value <- newValue
+        with get() = lastRequestedSettings.Value
+        and set newValue = lastRequestedSettings.Value <- newValue
 
     member x.ApplySettings (settings: AudioSettings) =
         match settings.Validate() with
