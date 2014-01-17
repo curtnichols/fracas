@@ -3,8 +3,8 @@
 type ViewModel(model: Model) as x =
     inherit MvvmFSharpLib.ObservableBase()
 
-    let mutable volume: float = model.CurrentSettings.Volume
-    let mutable pan: float = model.CurrentSettings.Pan
+    let volume = x.MakeField(<@ x.RequestedVolume @>, model.CurrentSettings.Volume)
+    let pan = x.MakeField(<@ x.RequestedPan @>, model.CurrentSettings.Pan)
     let isVolumeConstrained = x.MakeField<bool>(<@ x.IsVolumeConstrained @>)
 
     member x.Model
@@ -15,18 +15,18 @@ type ViewModel(model: Model) as x =
         and private set newValue = isVolumeConstrained.Value <- newValue
 
     member x.RequestedVolume
-        with get() = volume
+        with get() = volume.Value
         and set newValue =
-            if x.setProperty(&volume, newValue, <@ x.RequestedVolume @>) then
+            if volume.Set newValue then
                 match model.ApplySettings {model.LastRequestedSettings with Volume = newValue} with
                 | AudioSettingsAsIs(s) -> x.IsVolumeConstrained <- false ; ()
                 | AudioSettingsConstrained(s) -> x.IsVolumeConstrained <- true ; ()
                 | Error(msg) -> ()
 
     member x.RequestedPan
-        with get() = pan
+        with get() = pan.Value
         and set newValue =
-            if x.setProperty(&pan, newValue, <@ x.RequestedPan @>) then
+            if pan.Set newValue then
                 match model.ApplySettings {model.LastRequestedSettings with Pan = newValue} with
                 | AudioSettingsAsIs(s) | AudioSettingsConstrained(s) -> ()
                 | Error(msg) -> ()
