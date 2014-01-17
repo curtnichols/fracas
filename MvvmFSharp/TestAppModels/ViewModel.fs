@@ -29,8 +29,8 @@ type ViewModel(model: Model) as x =
         and set newValue =
             if requestedVolume.Set newValue then
                 match model.ApplySettings {model.LastRequestedSettings with Volume = newValue} with
-                | AudioSettingsAsIs s -> x.IsVolumeConstrained <- false ; ()
-                | AudioSettingsConstrained s -> x.IsVolumeConstrained <- true ; ()
+                | AudioSettingsAsIs s -> x.IsVolumeConstrained <- false
+                | AudioSettingsConstrained s -> x.IsVolumeConstrained <- true
                 | Error msg -> ()
 
     member x.RequestedPan
