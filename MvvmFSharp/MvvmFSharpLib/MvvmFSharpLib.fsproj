@@ -42,7 +42,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ObservableModel.fs" />
+    <Compile Include="ObservableBase.fs" />
     <None Include="Script.fsx" />
   </ItemGroup>
   <PropertyGroup>
