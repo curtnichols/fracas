@@ -18,18 +18,18 @@ type AppliedSettingsResult =
     | AudioSettingsConstrained of settings: AudioSettings
     | Error of error: string
 
-type Model(volume: float, pan: float) =
+type Model(volume: float, pan: float) as x =
     inherit MvvmFSharpLib.ObservableBase()
 
-    let mutable currentSettings: AudioSettings = { Volume = volume; Pan = pan }
-    let mutable requestedSettings: AudioSettings = { Volume = volume; Pan = pan }
+    let currentSettings = x.MakeField(<@ x.CurrentSettings @>, { Volume = volume; Pan = pan })
+    let requestedSettings = x.MakeField(<@ x.LastRequestedSettings @>, { Volume = volume; Pan = pan })
     
     member x.CurrentSettings
-        with get() = currentSettings
-        and set newValue = x.setProperty(&currentSettings, newValue, <@ x.CurrentSettings @>) |> ignore
+        with get() = currentSettings.Value
+        and set newValue = currentSettings.Value <- newValue
     member x.LastRequestedSettings
-        with get() = requestedSettings
-        and set newValue = x.setProperty(&requestedSettings, newValue, <@ x.LastRequestedSettings @>) |> ignore
+        with get() = requestedSettings.Value
+        and set newValue = requestedSettings.Value <- newValue
 
     member x.ApplySettings (settings: AudioSettings) =
         match settings.Validate() with
