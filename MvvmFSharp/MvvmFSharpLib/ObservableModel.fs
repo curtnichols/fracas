@@ -21,11 +21,10 @@ type ObservableBase() =
     member x.MakeCommand<'T>(canExecuteHandler, executeHandler, ?notifyOnFieldUpdate) =
         CommandBacker<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate)
 
-    // Used by FieldBacker
+    // Used by FieldBacker to update listeners
     member internal x.NotifyPropertyChanged(propertyName) =
         propertyChanged.Trigger(x, PropertyChangedEventArgs(propertyName))
 
-// TODO switch this to alternate constructor to avoid option arg and required tuple for args
 and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
     let mutable value = match initialValue with
                         | Some t -> t
@@ -50,7 +49,7 @@ and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
     /// Sets the value; use when a return value is required to determine if the value has changed.
     member x.Set newValue = setValue newValue
 
-    member internal x.Updated = internalUpdateEvent.Publish
+    member internal x.Updated = internalUpdateEvent.Publish // For internal clients like CommandBacker
 
 and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
                       executeHandler: 'T option -> unit,
