@@ -21,9 +21,11 @@ type AppliedSettingsResult =
 type Model(volume: float, pan: float) as x =
     inherit MvvmFSharpLib.ObservableBase()
 
+    // EXAMPLE: creates fields that on update cause notifications through ObservableBase.
     let currentSettings = x.MakeField(<@ x.CurrentSettings @>, { Volume = volume; Pan = pan })
     let lastRequestedSettings = x.MakeField(<@ x.LastRequestedSettings @>, { Volume = volume; Pan = pan })
     
+    // EXAMPLE: makes use of backing fields to implement properties with notifications.
     member x.CurrentSettings
         with get() = currentSettings.Value
         and set newValue = currentSettings.Value <- newValue
