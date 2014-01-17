@@ -12,7 +12,7 @@ type ViewModel(model: Model) as x =
     // and specifies field backer(s) that cause the command to update its executable status.
     let resetPanCommand = x.MakeCommand<float>((fun _ -> requestedPan.Value <> 0.0),
                                                (fun _ -> x.RequestedPan <- 0.0),
-                                               requestedPan)
+                                               [requestedPan])
 
     member x.Model with get() = model
 

@@ -55,14 +55,14 @@ and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
 /// Backs commands; note that the handlers take 'T option so use your pattern matching.
 and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
                       executeHandler: 'T option -> unit,
-                      notifyOnFieldUpdate: FieldBacker<'T> option) as x =
+                      notifyOnFieldUpdate: FieldBacker<'T> list option) as x =
     let canExecuteChanged = Event<_, _>()
-
     do
         match notifyOnFieldUpdate with
-        | Some fieldBacker ->
-            // Adds reference to related items only (in normal usage).
-            fieldBacker.Updated.Add(fun _ -> x.NotifyCanExecuteChanged())
+        | Some backers ->
+            let notifyUpdate = fun _ -> x.NotifyCanExecuteChanged()
+            for backer in backers do
+                backer.Updated.Add(notifyUpdate)
         | None -> ()
     
     interface ICommand with
