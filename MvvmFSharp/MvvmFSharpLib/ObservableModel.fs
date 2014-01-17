@@ -18,7 +18,8 @@ type ObservableBase() =
     member x.MakeField<'T>(propertyExpr, ?initialValue: 'T) = // TODO would rather have protected mfunc or func
         new FieldBacker<'T>(x, propertyExpr, initialValue)
 
-    member x.MakeCommand<'T>(canExecuteHandler, executeHandler) = CommandBacker<'T>(canExecuteHandler, executeHandler)
+    member x.MakeCommand<'T>(canExecuteHandler, executeHandler, ?notifyOnFieldUpdate) =
+        CommandBacker<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate)
 
     // Used by FieldBacker
     member internal x.NotifyPropertyChanged(propertyName) =
@@ -29,6 +30,7 @@ and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
     let mutable value = match initialValue with
                         | Some t -> t
                         | None -> Unchecked.defaultof<'T>
+    let internalUpdateEvent = new Event<'T>()
     let propertyName = 
         match propertyExpr with
         | PropertyGet(_, propOrValInfo, _) -> propOrValInfo.Name
@@ -38,6 +40,7 @@ and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
         else 
             value <- newValue
             om.NotifyPropertyChanged(propertyName)
+            internalUpdateEvent.Trigger newValue
             true
 
     member x.Value
@@ -47,8 +50,19 @@ and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
     /// Sets the value; use when a return value is required to determine if the value has changed.
     member x.Set newValue = setValue newValue
 
-and CommandBacker<'T>(canExececuteHandler: 'T option -> bool, executeHandler: 'T option -> unit) =
+    member internal x.Updated = internalUpdateEvent.Publish
+
+and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
+                      executeHandler: 'T option -> unit,
+                      notifyOnFieldUpdate: FieldBacker<'T> option) as x =
     let canExecuteChanged = Event<_, _>()
+
+    do
+        match notifyOnFieldUpdate with
+        | Some fieldBacker ->
+            // Adds reference to related items only (in normal usage).
+            fieldBacker.Updated.Add(fun _ -> x.NotifyCanExecuteChanged())
+        | None -> ()
     
     interface ICommand with
         [<CLIEvent>]
@@ -66,4 +80,4 @@ and CommandBacker<'T>(canExececuteHandler: 'T option -> bool, executeHandler: 'T
 
     member x.ICommand = x :> ICommand
 
-    member x.NotifyCanExecuteChanged = canExecuteChanged.Trigger(x, EventArgs.Empty)
+    member x.NotifyCanExecuteChanged() = canExecuteChanged.Trigger(x, EventArgs.Empty)
