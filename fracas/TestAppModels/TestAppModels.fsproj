@@ -46,8 +46,8 @@
     <Compile Include="ViewModel.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MvvmFSharpLib\MvvmFSharpLib.fsproj">
-      <Name>MvvmFSharpLib</Name>
+    <ProjectReference Include="..\fracasLib\fracasLib.fsproj">
+      <Name>fracasLib</Name>
       <Project>{53203d5c-8a17-4445-8f91-8cd0acc25862}</Project>
       <Private>True</Private>
     </ProjectReference>

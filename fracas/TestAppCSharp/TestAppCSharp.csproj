@@ -98,9 +98,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MvvmFSharpLib\MvvmFSharpLib.fsproj">
+    <ProjectReference Include="..\fracasLib\fracasLib.fsproj">
       <Project>{53203d5c-8a17-4445-8f91-8cd0acc25862}</Project>
-      <Name>MvvmFSharpLib</Name>
+      <Name>fracasLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\TestAppModels\TestAppModels.fsproj">
       <Project>{a9de7337-dff3-436e-bf95-855709ab7d38}</Project>
