@@ -1,5 +1,5 @@
-mvvm-fsharp
-===========
+fracas
+======
 
 This project is an exploration of loosely related F# code.
 
