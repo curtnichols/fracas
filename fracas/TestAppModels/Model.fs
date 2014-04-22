@@ -19,7 +19,7 @@ type AppliedSettingsResult =
     | Error of error: string
 
 type Model(volume: float, pan: float) as x =
-    inherit MvvmFSharpLib.ObservableBase()
+    inherit fracas.ObservableBase()
 
     // EXAMPLE: creates fields that on update cause notifications through ObservableBase.
     let currentSettings = x.MakeField(<@ x.CurrentSettings @>, { Volume = volume; Pan = pan })

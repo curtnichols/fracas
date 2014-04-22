@@ -2,5 +2,5 @@
 // for more guidance on F# programming.
 
 #load "ObservableModel.fs"
-open MvvmFSharpLib
+open fracas
 

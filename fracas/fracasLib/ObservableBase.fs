@@ -1,4 +1,4 @@
-﻿namespace MvvmFSharpLib
+﻿namespace fracas
 
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns

@@ -1,7 +1,7 @@
 ﻿namespace TestAppModels
 
 type ViewModel(model: Model) as x =
-    inherit MvvmFSharpLib.ObservableBase()
+    inherit fracas.ObservableBase()
 
     // EXAMPLE: creates fields that on update cause notifications through ObservableBase.
     let requestedVolume = x.MakeField(<@ x.RequestedVolume @>, model.CurrentSettings.Volume)

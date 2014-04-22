@@ -7,8 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>53203d5c-8a17-4445-8f91-8cd0acc25862</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>MvvmFSharpLib</RootNamespace>
-    <AssemblyName>MvvmFSharpLib</AssemblyName>
+    <RootNamespace>fracas</RootNamespace>
+    <AssemblyName>fracasLib</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Profile7</TargetFrameworkProfile>
     <TargetProfile>netcore</TargetProfile>
@@ -23,7 +23,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Debug\MvvmFSharpLib.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\fracasLib.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,7 +32,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Release\MvvmFSharpLib.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\fracasLib.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
