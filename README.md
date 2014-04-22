@@ -1,7 +1,9 @@
 mvvm-fsharp
 ===========
 
-This solution is an exploration of MVVM support coded in F#.
+This project is an exploration of loosely related F# code.
+
+Everything below is a bit old....
 
 Goals
 -----
