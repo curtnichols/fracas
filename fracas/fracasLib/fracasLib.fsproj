@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="ObservableBase.fs" />
     <None Include="Script.fsx" />
+    <Compile Include="Disposable.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">12</MinimumVisualStudioVersion>
