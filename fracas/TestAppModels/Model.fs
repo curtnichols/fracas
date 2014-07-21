@@ -25,7 +25,8 @@ type ValidationResult =
     | Success
     | Error of description: string
 
-type AudioSettings = { Volume: float; Pan: float } with
+type AudioSettings = { Volume: float; Pan: float }
+with
     member x.Validate() =
         match x.Volume with
         | v when v < 0.0 -> Error("Negative Volume is not supported")
@@ -50,6 +51,7 @@ type Model(volume: float, pan: float) as x =
     member x.CurrentSettings
         with get() = currentSettings.Value
         and set newValue = currentSettings.Value <- newValue
+
     member x.LastRequestedSettings
         with get() = lastRequestedSettings.Value
         and set newValue = lastRequestedSettings.Value <- newValue
@@ -70,6 +72,7 @@ type Model(volume: float, pan: float) as x =
                 delayedApplicationSimulation |> Async.Start
                 x.LastRequestedSettings <- s
             | Error desc -> ()
+
             constrained
 
     static member constrain settings =

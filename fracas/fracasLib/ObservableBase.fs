@@ -30,6 +30,7 @@ open System.Windows.Input
 
 /// Implements INotifyPropertyChanged for use in observable models.
 type ObservableBase() =
+
     let propertyChanged = Event<_, _>()
     
     interface INotifyPropertyChanged with 
@@ -48,6 +49,7 @@ type ObservableBase() =
 
 // Backs fields that cause updates in ObservableModel.
 and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
+
     let mutable value = match initialValue with
                         | Some t -> t
                         | None -> Unchecked.defaultof<'T>
@@ -56,6 +58,7 @@ and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
         match propertyExpr with
         | PropertyGet(_, propOrValInfo, _) -> propOrValInfo.Name
         | _ -> failwith "Unexpected expression type; needs PropertyGet"
+
     let setValue newValue =
         if Object.Equals(value, newValue) then false
         else 
@@ -77,6 +80,7 @@ and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
 and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
                       executeHandler: 'T option -> unit,
                       notifyOnFieldUpdate: FieldBacker<'T> list option) as x =
+
     let canExecuteChanged = Event<_, _>()
     do
         match notifyOnFieldUpdate with
@@ -89,11 +93,13 @@ and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
     interface ICommand with
         [<CLIEvent>]
         member x.CanExecuteChanged = canExecuteChanged.Publish
+
         member x.CanExecute parameter =
             match parameter with
             | :? 'T -> canExececuteHandler (Some (parameter :?> 'T))
             | p when p = null -> canExececuteHandler None
             | _ -> false
+
         member x.Execute parameter =
             match parameter with
             | :? 'T -> executeHandler (Some (parameter :?> 'T))
