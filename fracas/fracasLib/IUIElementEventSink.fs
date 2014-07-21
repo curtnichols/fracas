@@ -24,7 +24,8 @@ namespace fracas
 open System
 open System.Windows.Input
 
-// TODO
+// TODO - MouseButtonEventArgs doesn't appear to be available in the portable framework;
+// check updates.
 //type IUIElementEventSink = 
 //    abstract OnMouseDown: Object -> MouseButtonEventArgs -> unit
 //    abstract OnMouseUp: Object -> MouseButtonEventArgs -> unit
