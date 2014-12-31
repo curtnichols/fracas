@@ -48,7 +48,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ObservableBase.fs" />
+    <Compile Include="NotifyBase.fs" />
     <None Include="Script.fsx" />
     <Compile Include="Disposable.fs" />
     <Compile Include="IUIElementEventSink.fs" />
