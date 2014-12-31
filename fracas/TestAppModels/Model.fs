@@ -40,12 +40,12 @@ type AppliedSettingsResult =
     | AudioSettingsConstrained of settings: AudioSettings
     | Error of error: string
 
-type Model(volume: float, pan: float) as x =
+type Model(volume: float, pan: float) as self =
     inherit fracas.ObservableBase()
 
     // EXAMPLE: creates fields that on update cause notifications through ObservableBase.
-    let currentSettings = x.MakeField(<@ x.CurrentSettings @>, { Volume = volume; Pan = pan })
-    let lastRequestedSettings = x.MakeField(<@ x.LastRequestedSettings @>, { Volume = volume; Pan = pan })
+    let currentSettings = self |> fracas.mkField <@ self.CurrentSettings @> { Volume = volume; Pan = pan }
+    let lastRequestedSettings = self |> fracas.mkField <@ self.LastRequestedSettings @> { Volume = volume; Pan = pan }
     
     // EXAMPLE: makes use of backing fields to implement properties with notifications.
     member x.CurrentSettings

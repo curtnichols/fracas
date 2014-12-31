@@ -21,19 +21,19 @@
 
 namespace TestAppModels
 
-type ViewModel(model: Model) as x =
+type ViewModel(model: Model) as self =
     inherit fracas.ObservableBase()
 
     // EXAMPLE: creates fields that on update cause notifications through ObservableBase.
-    let requestedVolume = x.MakeField(<@ x.RequestedVolume @>, model.CurrentSettings.Volume)
-    let requestedPan = x.MakeField(<@ x.RequestedPan @>, model.CurrentSettings.Pan)
-    let isVolumeConstrained = x.MakeField<bool>(<@ x.IsVolumeConstrained @>)
+    let requestedVolume = self |> fracas.mkField <@ self.RequestedVolume @> model.CurrentSettings.Volume
+    let requestedPan = self |> fracas.mkField <@ self.RequestedPan @> model.CurrentSettings.Pan
+    let isVolumeConstrained = self |> fracas.mkField <@ self.IsVolumeConstrained @> false
 
     // EXAMPLE: creates a command backer with a "can execute" handler, an "execute" handler,
     // and specifies field backer(s) that cause the command to update its executable status.
-    let resetPanCommand = x.MakeCommand<float>((fun _ -> requestedPan.Value <> 0.0),
-                                               (fun _ -> x.RequestedPan <- 0.0),
-                                               [requestedPan])
+    let resetPanCommand = self |> fracas.mkCommand (fun _ -> requestedPan.Value <> 0.0)
+                                                   (fun _ -> self.RequestedPan <- 0.0)
+                                                   [requestedPan]
 
     member x.Model with get() = model
 

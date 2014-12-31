@@ -19,13 +19,12 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-namespace fracas
+module fracas
 
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 open System
 open System.ComponentModel
-open System.Runtime.CompilerServices 
 open System.Windows.Input
 
 /// Implements INotifyPropertyChanged for use in observable models.
@@ -35,12 +34,12 @@ type ObservableBase() =
     
     interface INotifyPropertyChanged with 
         [<CLIEvent>]
-        member x.PropertyChanged = propertyChanged.Publish
+        member __.PropertyChanged = propertyChanged.Publish
 
-    member x.MakeField<'T>(propertyExpr, ?initialValue: 'T) = // TODO would rather have protected mfunc or func
+    member internal x.MakeField<'T>(propertyExpr, ?initialValue: 'T) = // TODO would rather have protected mfunc or func
         new FieldBacker<'T>(x, propertyExpr, initialValue)
 
-    member x.MakeCommand<'T>(canExecuteHandler, executeHandler, ?notifyOnFieldUpdate) =
+    member internal __.MakeCommand<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate) =
         CommandBacker<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate)
 
     // Used by FieldBacker to update listeners
@@ -67,40 +66,37 @@ and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
             internalUpdateEvent.Trigger newValue
             true
 
-    member x.Value
+    member __.Value
         with get() = value
         and set newValue = setValue newValue |> ignore
 
     /// Sets the value; use when a return value is required to determine if the value has changed.
-    member x.Set newValue = setValue newValue
+    member __.Set newValue = setValue newValue
 
-    member internal x.Updated = internalUpdateEvent.Publish // For internal clients like CommandBacker
+    member internal __.Updated = internalUpdateEvent.Publish // For internal clients like CommandBacker
 
 /// Backs commands; note that the handlers take 'T option so use your pattern matching.
 and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
                       executeHandler: 'T option -> unit,
-                      notifyOnFieldUpdate: FieldBacker<'T> list option) as x =
+                      notifyOnFieldUpdate: FieldBacker<'T> list) as x =
 
     let canExecuteChanged = Event<_, _>()
     do
-        match notifyOnFieldUpdate with
-        | Some backers ->
-            let notifyUpdate = fun _ -> x.NotifyCanExecuteChanged()
-            for backer in backers do
-                backer.Updated.Add(notifyUpdate)
-        | None -> ()
+        let notifyUpdate = fun _ -> x.NotifyCanExecuteChanged()
+        for backer in notifyOnFieldUpdate do
+            backer.Updated.Add(notifyUpdate)
     
     interface ICommand with
         [<CLIEvent>]
-        member x.CanExecuteChanged = canExecuteChanged.Publish
+        member __.CanExecuteChanged = canExecuteChanged.Publish
 
-        member x.CanExecute parameter =
+        member __.CanExecute parameter =
             match parameter with
             | :? 'T -> canExececuteHandler (Some (parameter :?> 'T))
             | p when p = null -> canExececuteHandler None
             | _ -> false
 
-        member x.Execute parameter =
+        member __.Execute parameter =
             match parameter with
             | :? 'T -> executeHandler (Some (parameter :?> 'T))
             | p when p = null -> executeHandler None
@@ -109,3 +105,13 @@ and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
     member x.ICommand = x :> ICommand
 
     member x.NotifyCanExecuteChanged() = canExecuteChanged.Trigger(x, EventArgs.Empty)
+
+// Functions
+
+let mkField<'T> propertyExpr (initialValue: 'T) (obs: ObservableBase) = obs.MakeField (propertyExpr, initialValue)
+
+let mkCommand<'T> canExecuteHandler executeHandler (notifyOnFieldUpdate: FieldBacker<'T> list) (obs: ObservableBase) =
+    
+    obs.MakeCommand<'T> (canExecuteHandler, executeHandler, notifyOnFieldUpdate)
+
+let notifyAllChanged (obs: ObservableBase) = obs.NotifyPropertyChanged ""
