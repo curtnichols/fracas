@@ -36,8 +36,8 @@ type ObservableBase() =
         [<CLIEvent>]
         member __.PropertyChanged = propertyChanged.Publish
 
-    member internal x.MakeField<'T>(propertyExpr, ?initialValue: 'T) = // TODO would rather have protected mfunc or func
-        new FieldBacker<'T>(x, propertyExpr, initialValue)
+    member internal __.MakeField<'T>(propertyExpr, ?initialValue: 'T) =
+        new FieldBacker<'T>(__, propertyExpr, initialValue)
 
     member internal __.MakeCommand<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate) =
         CommandBacker<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate)
@@ -73,7 +73,7 @@ and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
     /// Sets the value; use when a return value is required to determine if the value has changed.
     member __.Set newValue = setValue newValue
 
-    member internal __.Updated = internalUpdateEvent.Publish // For internal clients like CommandBacker
+    member internal __.Updated = internalUpdateEvent.Publish
 
 /// Backs commands; note that the handlers take 'T option so use your pattern matching.
 and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
