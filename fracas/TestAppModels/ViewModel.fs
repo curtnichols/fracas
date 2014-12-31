@@ -22,7 +22,7 @@
 namespace TestAppModels
 
 type ViewModel(model: Model) as self =
-    inherit fracas.ObservableBase()
+    inherit fracas.NotifyBase ()
 
     // EXAMPLE: creates fields that on update cause notifications through ObservableBase.
     let requestedVolume = self |> fracas.mkField <@ self.RequestedVolume @> model.CurrentSettings.Volume

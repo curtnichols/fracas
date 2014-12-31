@@ -28,7 +28,7 @@ open System.ComponentModel
 open System.Windows.Input
 
 /// Implements INotifyPropertyChanged for use in observable models.
-type ObservableBase() =
+type NotifyBase() =
 
     let propertyChanged = Event<_, _>()
     
@@ -47,7 +47,7 @@ type ObservableBase() =
         propertyChanged.Trigger(x, PropertyChangedEventArgs(propertyName))
 
 // Backs fields that cause updates in ObservableModel.
-and FieldBacker<'T>(om: ObservableBase, propertyExpr, initialValue: 'T option) =
+and FieldBacker<'T>(om: NotifyBase, propertyExpr, initialValue: 'T option) =
 
     let mutable value = match initialValue with
                         | Some t -> t
@@ -108,10 +108,10 @@ and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
 
 // Functions
 
-let mkField<'T> propertyExpr (initialValue: 'T) (obs: ObservableBase) = obs.MakeField (propertyExpr, initialValue)
+let mkField<'T> propertyExpr (initialValue: 'T) (obs: NotifyBase) = obs.MakeField (propertyExpr, initialValue)
 
-let mkCommand<'T> canExecuteHandler executeHandler (notifyOnFieldUpdate: FieldBacker<'T> list) (obs: ObservableBase) =
+let mkCommand<'T> canExecuteHandler executeHandler (notifyOnFieldUpdate: FieldBacker<'T> list) (obs: NotifyBase) =
     
     obs.MakeCommand<'T> (canExecuteHandler, executeHandler, notifyOnFieldUpdate)
 
-let notifyAllChanged (obs: ObservableBase) = obs.NotifyPropertyChanged ""
+let notifyAllChanged (obs: NotifyBase) = obs.NotifyPropertyChanged ""

@@ -41,7 +41,7 @@ type AppliedSettingsResult =
     | Error of error: string
 
 type Model(volume: float, pan: float) as self =
-    inherit fracas.ObservableBase()
+    inherit fracas.NotifyBase ()
 
     // EXAMPLE: creates fields that on update cause notifications through ObservableBase.
     let currentSettings = self |> fracas.mkField <@ self.CurrentSettings @> { Volume = volume; Pan = pan }
