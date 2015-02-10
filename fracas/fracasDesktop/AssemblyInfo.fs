@@ -1,4 +1,6 @@
-﻿module AssemblyInfo
+﻿// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+
+module AssemblyInfo
 
 open System.Reflection
 open System.Runtime.CompilerServices
@@ -12,7 +14,7 @@ open System.Runtime.InteropServices
 [<assembly: AssemblyConfiguration("Desktop/WPF")>]
 [<assembly: AssemblyCompany("Curt Nichols")>]
 [<assembly: AssemblyProduct("fracas")>]
-[<assembly: AssemblyCopyright("Copyright © Curt Nichols 2014-2015")>]
+[<assembly: AssemblyCopyright("Copyright © Curt Nichols 2013-2015")>]
 [<assembly: AssemblyTrademark("")>]
 [<assembly: AssemblyCulture("")>]
 
