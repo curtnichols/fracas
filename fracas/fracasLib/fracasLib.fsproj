@@ -51,7 +51,6 @@
     <Compile Include="NotifyBase.fs" />
     <None Include="Script.fsx" />
     <Compile Include="Disposable.fs" />
-    <Compile Include="IUIElementEventSink.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">12</MinimumVisualStudioVersion>

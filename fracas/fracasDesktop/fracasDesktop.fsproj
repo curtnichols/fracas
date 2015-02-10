@@ -49,10 +49,10 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <None Include="Script.fsx" />
     <Compile Include="..\fracasLib\NotifyBase.fs">
       <Link>NotifyBase.fs</Link>
     </Compile>
+    <Compile Include="AssemblyInfo.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
