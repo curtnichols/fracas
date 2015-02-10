@@ -10,7 +10,7 @@ open System.Runtime.InteropServices
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [<assembly: AssemblyTitle("fracas")>]
-[<assembly: AssemblyDescription("Minimal MVVM Support Library")>]
+[<assembly: AssemblyDescription("Minimalist MVVM Support Library for F#")>]
 [<assembly: AssemblyConfiguration("Desktop/WPF")>]
 [<assembly: AssemblyCompany("Curt Nichols")>]
 [<assembly: AssemblyProduct("fracas")>]
