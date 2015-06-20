@@ -8,12 +8,15 @@ open System
 open System.ComponentModel
 open System.Windows.Input
 
+type IFieldBacker =
+    abstract member Updated : IEvent<obj> with get
+
 /// Implements INotifyPropertyChanged for use in observable models.
 type NotifyBase() =
 
     let propertyChanged = Event<_, _>()
     
-    interface INotifyPropertyChanged with 
+    interface INotifyPropertyChanged with
         [<CLIEvent>]
         member __.PropertyChanged = propertyChanged.Publish
 
@@ -33,7 +36,7 @@ and FieldBacker<'T>(om: NotifyBase, propertyExpr, initialValue: 'T option) =
     let mutable value = match initialValue with
                         | Some t -> t
                         | None -> Unchecked.defaultof<'T>
-    let internalUpdateEvent = new Event<'T>()
+    let internalUpdateEvent = new Event<obj>()
     let propertyName = 
         match propertyExpr with
         | PropertyGet(_, propOrValInfo, _) -> propOrValInfo.Name
@@ -54,12 +57,16 @@ and FieldBacker<'T>(om: NotifyBase, propertyExpr, initialValue: 'T option) =
     /// Sets the value; use when a return value is required to determine if the value has changed.
     member __.Set newValue = setValue newValue
 
-    member internal __.Updated = internalUpdateEvent.Publish
+    interface IFieldBacker with
+        member __.Updated: IEvent<obj> = 
+            internalUpdateEvent.Publish
+
+    member internal x.Updated = (x :> IFieldBacker).Updated
 
 /// Backs commands; note that the handlers take 'T option so use your pattern matching.
 and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
                       executeHandler: 'T option -> unit,
-                      notifyOnFieldUpdate: FieldBacker<'T> list) as x =
+                      notifyOnFieldUpdate: IFieldBacker list) as x =
 
     let canExecuteChanged = Event<_, _>()
     do
@@ -91,7 +98,7 @@ and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
 
 let mkField<'T> propertyExpr (initialValue: 'T) (obs: NotifyBase) = obs.MakeField (propertyExpr, initialValue)
 
-let mkCommand<'T> canExecuteHandler executeHandler (notifyOnFieldUpdate: FieldBacker<'T> list) (obs: NotifyBase) =
+let mkCommand<'T> canExecuteHandler executeHandler (notifyOnFieldUpdate: IFieldBacker list) (obs: NotifyBase) =
     
     obs.MakeCommand<'T> (canExecuteHandler, executeHandler, notifyOnFieldUpdate)
 
