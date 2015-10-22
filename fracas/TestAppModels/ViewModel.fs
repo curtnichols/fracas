@@ -10,6 +10,14 @@ type ViewModel(model: Model) as self =
     let requestedPan = self |> fracas.mkField <@ self.RequestedPan @> model.CurrentSettings.Pan
     let isVolumeConstrained = self |> fracas.mkField <@ self.IsVolumeConstrained @> false
 
+    let derived1 =
+            self |> fracas.mkDerivedField <@ self.Derived1 @> [ requestedVolume ]
+                        (fun () -> requestedVolume.Value)
+    // Second-order derivation
+    let derivedVolumeAsAString =
+            self |> fracas.mkDerivedField <@ self.DerivedVolumeAsAString @> [ derived1 ]
+                        (fun () -> sprintf "Derived volume as a string: %.2f" derived1.Value)
+
     // EXAMPLE: creates a command backer with a "can execute" handler, an "execute" handler,
     // and specifies field backer(s) that cause the command to update its executable status.
     let resetPanCommand = self |> fracas.mkCommand (fun _ -> requestedPan.Value <> 0.0)
@@ -34,6 +42,16 @@ type ViewModel(model: Model) as self =
                 | AudioSettingsAsIs s -> x.IsVolumeConstrained <- false
                 | AudioSettingsConstrained s -> x.IsVolumeConstrained <- true
                 | Error msg -> ()
+
+    member x.Derived1
+        with get() = derived1.Value
+
+    member x.DerivedVolumeAsAString
+        with get() =
+            // Derived field backers require a 'generateValue' function in order to keep the same
+            // 'backer.Value' usage as common field backers. This also allows us to keep a reference
+            // to the backer in the property implementation, avoiding GC-ing the backer.
+            derivedVolumeAsAString.Value
 
     member x.RequestedPan
         with get() = requestedPan.Value

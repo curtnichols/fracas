@@ -19,6 +19,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Label Grid.Column="4" HorizontalAlignment="Left">ViewModel Requested</Label>
@@ -44,15 +45,16 @@
             </TextBlock>
         </StackPanel>
         <TextBlock Grid.Row="1" Grid.Column="8" VerticalAlignment="Center" Text="{Binding Model.CurrentSettings.Volume, StringFormat={}{0:N2}}"/>
+        <TextBlock Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" Text="{Binding DerivedVolumeAsAString}"/>
 
-        <Label Grid.Row="2" Content="Pan"/>
-        <Slider Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Width="160" Minimum="-1" Maximum="1" SmallChange="0.1" LargeChange="0.25"
+        <Label Grid.Row="3" Content="Pan"/>
+        <Slider Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" Width="160" Minimum="-1" Maximum="1" SmallChange="0.1" LargeChange="0.25"
                 Value="{Binding RequestedPan}"/>
-        <TextBlock Grid.Row="2" Grid.Column="4" VerticalAlignment="Center" Text="{Binding RequestedPan, StringFormat={}{0:N2}}"/>
-        <TextBlock Grid.Row="2" Grid.Column="6" VerticalAlignment="Center" Text="{Binding Model.LastRequestedSettings.Pan, StringFormat={}{0:N2}}"/>
-        <TextBlock Grid.Row="2" Grid.Column="8" VerticalAlignment="Center" Text="{Binding Model.CurrentSettings.Pan, StringFormat={}{0:N2}}"/>
+        <TextBlock Grid.Row="3" Grid.Column="4" VerticalAlignment="Center" Text="{Binding RequestedPan, StringFormat={}{0:N2}}"/>
+        <TextBlock Grid.Row="3" Grid.Column="6" VerticalAlignment="Center" Text="{Binding Model.LastRequestedSettings.Pan, StringFormat={}{0:N2}}"/>
+        <TextBlock Grid.Row="3" Grid.Column="8" VerticalAlignment="Center" Text="{Binding Model.CurrentSettings.Pan, StringFormat={}{0:N2}}"/>
         
-        <Button Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" Content="Reset Pan"
+        <Button Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center" Content="Reset Pan"
                 Command="{Binding ResetPanCommand}"/>
     </Grid>
 </Window>
