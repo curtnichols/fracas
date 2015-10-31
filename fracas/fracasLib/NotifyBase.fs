@@ -98,7 +98,7 @@ and DerivedFieldBacker<'T>(om: NotifyBase, propertyExpr, precedingFields, genera
     member internal x.Updated = (x :> IFieldBacker).Updated
 
 /// Backs commands; note that the handlers take 'T option so use your pattern matching.
-and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
+and CommandBacker<'T>(canExecuteHandler: 'T option -> bool,
                       executeHandler: 'T option -> unit,
                       notifyOnFieldUpdate: IFieldBacker list) as x =
 
@@ -107,22 +107,25 @@ and CommandBacker<'T>(canExececuteHandler: 'T option -> bool,
         let notifyUpdate = fun _ -> x.NotifyCanExecuteChanged()
         for backer in notifyOnFieldUpdate do
             backer.Updated.Add(notifyUpdate)
-    
+
+    let objParameterToTypedParameter (parameter : obj) =
+
+        match Convert.ChangeType(parameter, typedefof<'T>) with
+        | null -> None
+        | v -> Some (v :?> 'T)
+
     interface ICommand with
+
         [<CLIEvent>]
         member __.CanExecuteChanged = canExecuteChanged.Publish
 
         member __.CanExecute parameter =
-            match parameter with
-            | :? 'T -> canExececuteHandler (Some (parameter :?> 'T))
-            | p when p = null -> canExececuteHandler None
-            | _ -> false
+
+            canExecuteHandler (objParameterToTypedParameter parameter)
 
         member __.Execute parameter =
-            match parameter with
-            | :? 'T -> executeHandler (Some (parameter :?> 'T))
-            | p when p = null -> executeHandler None
-            | _ -> () // Unexpected parameter type // TODO what to do here?
+
+            executeHandler (objParameterToTypedParameter parameter)
 
     member x.ICommand = x :> ICommand
 
