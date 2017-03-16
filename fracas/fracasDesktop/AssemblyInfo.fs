@@ -14,11 +14,11 @@ open System.Runtime.InteropServices
 [<assembly: AssemblyConfiguration("Desktop/WPF")>]
 [<assembly: AssemblyCompany("Curt Nichols")>]
 [<assembly: AssemblyProduct("fracas")>]
-[<assembly: AssemblyCopyright("Copyright © Curt Nichols 2013-2015")>]
+[<assembly: AssemblyCopyright("Copyright © Curt Nichols 2013-2017")>]
 [<assembly: AssemblyTrademark("")>]
 [<assembly: AssemblyCulture("")>]
 
-[<assembly: AssemblyVersion("0.2.0.0")>]
-[<assembly: AssemblyFileVersion("0.2.0.0")>]
+[<assembly: AssemblyVersion("0.6.0.0")>]
+[<assembly: AssemblyFileVersion("0.6.0.0")>]
 
 do ()
