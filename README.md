@@ -1,8 +1,6 @@
 fracas
 ======
 
-This project is an exploration of loosely related F# code.
-
 Please note this is an experimental repository; things may change.
 
 Goals
