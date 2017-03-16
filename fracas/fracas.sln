@@ -7,6 +7,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fracasDesktop", "fracasDesk
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{64E74A51-EF00-4F43-BDDA-4CF5508B0BE9}"
 	ProjectSection(SolutionItems) = preProject
+		nuget\build_nuget_packages.cmd = nuget\build_nuget_packages.cmd
 		nuget\fracas.nuspec = nuget\fracas.nuspec
 	EndProjectSection
 EndProject
