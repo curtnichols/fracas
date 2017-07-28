@@ -20,6 +20,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Label Grid.Column="4" HorizontalAlignment="Left">ViewModel Requested</Label>
@@ -56,5 +57,9 @@
         
         <Button Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center" Content="Reset Pan"
                 Command="{Binding ResetPanCommand}"/>
+
+        <Button Grid.Row="5" Grid.Column="6" HorizontalAlignment="Center" Content="Slow Async Command" MinHeight="24"
+                Command="{Binding SlowAsyncCommand}"
+                IsEnabled="{Binding SlowAsyncCommand.IsNotExecuting}"/>
     </Grid>
 </Window>

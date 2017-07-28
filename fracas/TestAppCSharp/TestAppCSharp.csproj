@@ -106,6 +106,10 @@
       <Project>{7a25b219-c975-4551-a9a6-25a225ab483f}</Project>
       <Name>fracasDesktop</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TestAppModels\TestAppModels.fsproj">
+      <Project>{e7e3bd11-bfe8-4b4d-8d01-38e4e7258611}</Project>
+      <Name>TestAppModels</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

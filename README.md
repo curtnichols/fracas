@@ -1,13 +1,9 @@
 fracas
 ======
 
-Please note this is an experimental repository; things may change.
+**fracas** is a minimalist MVVM library built in F# for F#. Please see the sample "test" application and view model for examples.
 
-Release Notes
--------------
-As of v0.6.0, **fracas**
-* takes a dependency on F# 4.1 and FSharp.Core.dll 4.4.1.0.
-* removes PCL support.
+Release notes are [here](release-history.md).
 
 Goals
 -----

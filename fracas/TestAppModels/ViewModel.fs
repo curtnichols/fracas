@@ -24,10 +24,16 @@ type ViewModel(model: Model) as self =
                                                    (fun _ -> self.RequestedPan <- 0.0)
                                                    [requestedPan]
 
+    let slowAsyncCommand = self |> fracas.mkAsyncCommand (fun _ -> true)
+                                                         (fun _ -> async { do! Async.Sleep(2000) })
+                                                         []
+
     member x.Model with get() = model
 
     // EXAMPLE: exposes a command backer as ICommand
     member x.ResetPanCommand with get() = resetPanCommand.ICommand
+
+    member x.SlowAsyncCommand with get() = slowAsyncCommand.ICommand
 
     // EXAMPLE: makes use of backing fields to implement properties with notifications.
     member x.IsVolumeConstrained

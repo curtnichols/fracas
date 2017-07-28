@@ -21,6 +21,12 @@ module private NotifyBaseImpl =
 type IFieldBacker =
     abstract member Updated : IEvent<obj> with get
 
+/// Provides an ICommand interface with additional useful properties.
+type ICommandWithExtras =
+    inherit ICommand
+    abstract member IsExecuting : bool with get
+    abstract member IsNotExecuting : bool with get
+
 /// Implements INotifyPropertyChanged for use in observable models.
 type NotifyBase() =
 
@@ -38,6 +44,9 @@ type NotifyBase() =
 
     member internal __.MakeCommand<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate) =
         CommandBacker<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate)
+
+    member internal __.MakeAsyncCommand<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate) =
+        AsyncCommandBacker<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate)
 
     // Used by FieldBacker to update listeners
     member internal x.NotifyPropertyChanged(propertyName) =
@@ -100,11 +109,19 @@ and DerivedFieldBacker<'T>(om: NotifyBase, propertyExpr, precedingFields, genera
 /// Backs commands; note that the handlers take 'T option so use your pattern matching.
 and CommandBacker<'T>(canExecuteHandler: 'T option -> bool,
                       executeHandler: 'T option -> unit,
-                      notifyOnFieldUpdate: IFieldBacker list) as x =
+                      notifyOnFieldUpdate: IFieldBacker list) as self =
+    inherit NotifyBase()
 
     let canExecuteChanged = Event<_, _>()
+    let mutable isExecuting = false
+
+    let setIsExecuting value =
+        isExecuting <- value
+        self.NotifyPropertyChanged("IsExecuting")
+        self.NotifyPropertyChanged("IsNotExecuting")
+
     do
-        let notifyUpdate = fun _ -> x.NotifyCanExecuteChanged()
+        let notifyUpdate = fun _ -> self.NotifyCanExecuteChanged()
         for backer in notifyOnFieldUpdate do
             backer.Updated.Add(notifyUpdate)
 
@@ -114,22 +131,84 @@ and CommandBacker<'T>(canExecuteHandler: 'T option -> bool,
         | null -> None
         | v -> Some (v :?> 'T)
 
-    interface ICommand with
-
+    interface ICommandWithExtras with
         [<CLIEvent>]
         member __.CanExecuteChanged = canExecuteChanged.Publish
 
         member __.CanExecute parameter =
 
-            canExecuteHandler (objParameterToTypedParameter parameter)
+            not isExecuting && canExecuteHandler (objParameterToTypedParameter parameter)
 
         member __.Execute parameter =
 
-            executeHandler (objParameterToTypedParameter parameter)
+            try
+                executeHandler (objParameterToTypedParameter parameter)
+            finally
+                ()
 
-    member x.ICommand = x :> ICommand
+        member __.IsExecuting with get() = isExecuting
+        member __.IsNotExecuting with get() = not isExecuting
 
-    member x.NotifyCanExecuteChanged() = canExecuteChanged.Trigger(x, EventArgs.Empty)
+    member self.ICommand = self :> ICommandWithExtras
+
+    member self.IsExecuting = (self :> ICommandWithExtras).IsExecuting
+    member self.IsNotExecuting = (self :> ICommandWithExtras).IsNotExecuting
+
+    member self.NotifyCanExecuteChanged() = canExecuteChanged.Trigger(self, EventArgs.Empty)
+
+/// Backs commands that are executed asynchronously; note that the handlers take 'T option so use your pattern matching.
+and AsyncCommandBacker<'T>(canExecuteHandler: 'T option -> bool,
+                           executeHandler: 'T option -> Async<unit>,
+                           notifyOnFieldUpdate: IFieldBacker list) as self =
+    inherit NotifyBase()
+
+    let canExecuteChanged = Event<_, _>()
+    let mutable isExecuting = false
+
+    let setIsExecuting value =
+        isExecuting <- value
+        self.NotifyPropertyChanged("IsExecuting")
+        self.NotifyPropertyChanged("IsNotExecuting")
+
+    do
+        let notifyUpdate = fun _ -> self.NotifyCanExecuteChanged()
+        for backer in notifyOnFieldUpdate do
+            backer.Updated.Add(notifyUpdate)
+
+    let objParameterToTypedParameter (parameter : obj) =
+
+        match Convert.ChangeType(parameter, typedefof<'T>) with
+        | null -> None
+        | v -> Some (v :?> 'T)
+
+    interface ICommandWithExtras with
+        [<CLIEvent>]
+        member __.CanExecuteChanged = canExecuteChanged.Publish
+
+        member __.CanExecute parameter =
+
+            not isExecuting && canExecuteHandler (objParameterToTypedParameter parameter)
+
+        member __.Execute parameter =
+
+            let clearIsExecuting _ = setIsExecuting false
+
+            setIsExecuting true
+            try
+                Async.StartWithContinuations(executeHandler (objParameterToTypedParameter parameter),
+                    clearIsExecuting, clearIsExecuting, clearIsExecuting)
+            with
+                _ -> setIsExecuting false
+
+        member __.IsExecuting with get() = isExecuting
+        member __.IsNotExecuting with get() = not isExecuting
+
+    member self.ICommand = self :> ICommandWithExtras
+
+    member self.IsExecuting = (self :> ICommandWithExtras).IsExecuting
+    member self.IsNotExecuting = (self :> ICommandWithExtras).IsNotExecuting
+
+    member self.NotifyCanExecuteChanged() = canExecuteChanged.Trigger(self, EventArgs.Empty)
 
 // Functions
 
@@ -141,5 +220,9 @@ let mkDerivedField<'T> propertyExpr precedingFields generateValue (obs: NotifyBa
 let mkCommand<'T> canExecuteHandler executeHandler (notifyOnFieldUpdate: IFieldBacker list) (obs: NotifyBase) =
     
     obs.MakeCommand<'T> (canExecuteHandler, executeHandler, notifyOnFieldUpdate)
+
+let mkAsyncCommand<'T> canExecuteHandler executeHandler (notifyOnFieldUpdate: IFieldBacker list) (obs: NotifyBase) =
+
+    obs.MakeAsyncCommand<'T> (canExecuteHandler, executeHandler, notifyOnFieldUpdate)
 
 let notifyAllChanged (obs: NotifyBase) = obs.NotifyPropertyChanged ""
