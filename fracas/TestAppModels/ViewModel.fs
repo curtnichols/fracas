@@ -52,8 +52,6 @@ type ViewModel(model: Model) as self =
                               (fun _ -> None)
                               []
 
-    let mutable asyncCommandCancellationToken = None
-
     // This to-be-cancelled command is not friendly with a CancellationTokenSource that is
     // set to cancel after T time period, as it's not known when the command will be exeucted.
     // The time period tends to expire before the button is pushed or at another indeterminate time.
