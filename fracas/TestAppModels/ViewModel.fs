@@ -2,6 +2,9 @@
 
 namespace TestAppModels
 
+open System
+open System.Threading
+
 type ViewModel(model: Model) as self =
     inherit fracas.NotifyBase ()
 
@@ -24,9 +27,55 @@ type ViewModel(model: Model) as self =
                                                    (fun _ -> self.RequestedPan <- 0.0)
                                                    [requestedPan]
 
-    let slowAsyncCommand = self |> fracas.mkAsyncCommand (fun _ -> true)
-                                                         (fun _ -> async { do! Async.Sleep(2000) })
-                                                         []
+    let asyncTestFunc f _ = async { do! async { self.ErrorRecoveryText <- "Running..." }
+                                    do! f }
+
+    let slowAsyncCommand =
+        self |>
+        fracas.mkAsyncCommand (fun _ -> true)
+                              (asyncTestFunc (Async.Sleep(2000)))
+                              (fun _ -> self.ErrorRecoveryText <- "Done.")
+                              (fun exn -> self.ErrorRecoveryText <- sprintf "Exception: %s" exn.Message)
+                              (fun cexn -> self.ErrorRecoveryText <- sprintf "Exception: %s" cexn.Message)
+                              (fun _ -> None)
+                              []
+
+    let asyncExceptionCommand =
+        self |>
+        fracas.mkAsyncCommand (fun _ -> true)
+                              (asyncTestFunc (async {
+                                do! Async.Sleep(1000)
+                                failwith "async cmd with exception" }))
+                              (fun _ -> self.ErrorRecoveryText <- "Done.")
+                              (fun exn -> self.ErrorRecoveryText <- sprintf "Exception: %s" exn.Message)
+                              (fun cexn -> self.ErrorRecoveryText <- sprintf "Exception: %s" cexn.Message)
+                              (fun _ -> None)
+                              []
+
+    let mutable asyncCommandCancellationToken = None
+
+    // This to-be-cancelled command is not friendly with a CancellationTokenSource that is
+    // set to cancel after T time period, as it's not known when the command will be exeucted.
+    // The time period tends to expire before the button is pushed or at another indeterminate time.
+    let asyncCancelledCommand =
+        let getCancellationTokenWithTimeout () = 
+            let cts = new CancellationTokenSource()
+            cts.CancelAfter(TimeSpan.FromSeconds(2.0))
+            Some cts.Token
+
+        self |>
+        fracas.mkAsyncCommand (fun _ -> true)
+                              (asyncTestFunc (async {
+                                do! Async.Sleep(20 * 1000)
+                                do! async { self.ErrorRecoveryText <- "Done!?" }
+                              }))
+                              (fun _ -> self.ErrorRecoveryText <- "Done.")
+                              (fun exn -> self.ErrorRecoveryText <- sprintf "Exception: %s" exn.Message)
+                              (fun cexn -> self.ErrorRecoveryText <- sprintf "Exception: %s" cexn.Message)
+                              getCancellationTokenWithTimeout
+                              []
+
+    let errorRecoveryText = self |> fracas.mkField <@ self.ErrorRecoveryText @> ""
 
     member x.Model with get() = model
 
@@ -34,6 +83,10 @@ type ViewModel(model: Model) as self =
     member x.ResetPanCommand with get() = resetPanCommand.ICommand
 
     member x.SlowAsyncCommand with get() = slowAsyncCommand.ICommand
+
+    member x.AsyncExceptionCommand with get() = asyncExceptionCommand.ICommand
+
+    member x.AsyncCancelledCommand with get() = asyncCancelledCommand.ICommand
 
     // EXAMPLE: makes use of backing fields to implement properties with notifications.
     member x.IsVolumeConstrained
@@ -66,3 +119,7 @@ type ViewModel(model: Model) as self =
                 match model.ApplySettings {model.LastRequestedSettings with Pan = newValue} with
                 | AudioSettingsAsIs s | AudioSettingsConstrained s -> ()
                 | Error msg -> ()
+
+    member x.ErrorRecoveryText
+        with get() = errorRecoveryText.Value
+        and set newValue = errorRecoveryText.Value <- newValue

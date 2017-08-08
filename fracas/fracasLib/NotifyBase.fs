@@ -6,6 +6,7 @@ open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.Patterns
 open System
 open System.ComponentModel
+open System.Threading
 open System.Windows.Input
 
 [<AutoOpen>]
@@ -42,11 +43,19 @@ type NotifyBase() =
     member internal __.MakeDerivedField<'T>(propertyExpr, precedingFields, generateValue) =
         new DerivedFieldBacker<'T>(__, propertyExpr, precedingFields, generateValue)
 
-    member internal __.MakeCommand<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate) =
+    member internal __.MakeCommand<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate,
+                                       ?cancellationToken) =
         CommandBacker<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate)
 
-    member internal __.MakeAsyncCommand<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate) =
-        AsyncCommandBacker<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate)
+    member internal __.MakeAsyncCommand<'TInput, 'TOutput>(canExecuteHandler,
+                                                           executeHandler,
+                                                           onDone,
+                                                           onException,
+                                                           onCancelled,
+                                                           getCancellationToken,
+                                                           notifyOnFieldUpdate) =
+        AsyncCommandBacker<'TInput, 'TOutput>(canExecuteHandler, executeHandler,
+            onDone, onException, onCancelled, getCancellationToken, notifyOnFieldUpdate)
 
     // Used by FieldBacker to update listeners
     member internal x.NotifyPropertyChanged(propertyName) =
@@ -157,9 +166,13 @@ and CommandBacker<'T>(canExecuteHandler: 'T option -> bool,
     member self.NotifyCanExecuteChanged() = canExecuteChanged.Trigger(self, EventArgs.Empty)
 
 /// Backs commands that are executed asynchronously; note that the handlers take 'T option so use your pattern matching.
-and AsyncCommandBacker<'T>(canExecuteHandler: 'T option -> bool,
-                           executeHandler: 'T option -> Async<unit>,
-                           notifyOnFieldUpdate: IFieldBacker list) as self =
+and AsyncCommandBacker<'TInput, 'TOutput>(canExecuteHandler: 'TInput option -> bool,
+                                          executeHandler: 'TInput option -> Async<'TOutput>,
+                                          onDone: 'TOutput -> unit,
+                                          onException: Exception -> unit,
+                                          onCancelled: OperationCanceledException -> unit,
+                                          getCancellationToken: unit -> CancellationToken option,
+                                          notifyOnFieldUpdate: IFieldBacker list) as self =
     inherit NotifyBase()
 
     let canExecuteChanged = Event<_, _>()
@@ -177,9 +190,9 @@ and AsyncCommandBacker<'T>(canExecuteHandler: 'T option -> bool,
 
     let objParameterToTypedParameter (parameter : obj) =
 
-        match Convert.ChangeType(parameter, typedefof<'T>) with
+        match Convert.ChangeType(parameter, typedefof<'TInput>) with
         | null -> None
-        | v -> Some (v :?> 'T)
+        | v -> Some (v :?> 'TInput)
 
     interface ICommandWithExtras with
         [<CLIEvent>]
@@ -192,11 +205,19 @@ and AsyncCommandBacker<'T>(canExecuteHandler: 'T option -> bool,
         member __.Execute parameter =
 
             let clearIsExecuting _ = setIsExecuting false
+            let localOnDone v = onDone v
+                                clearIsExecuting()
+            let localOnException exn = onException exn
+                                       clearIsExecuting()
+            let localOnCancelled cexn = onCancelled cexn
+                                        clearIsExecuting()
 
             setIsExecuting true
             try
-                Async.StartWithContinuations(executeHandler (objParameterToTypedParameter parameter),
-                    clearIsExecuting, clearIsExecuting, clearIsExecuting)
+                Async.StartWithContinuations(
+                    executeHandler (objParameterToTypedParameter parameter),
+                    localOnDone, localOnException, localOnCancelled,
+                    ?cancellationToken = getCancellationToken())
             with
                 _ -> setIsExecuting false
 
@@ -212,17 +233,39 @@ and AsyncCommandBacker<'T>(canExecuteHandler: 'T option -> bool,
 
 // Functions
 
-let mkField<'T> propertyExpr (initialValue: 'T) (obs: NotifyBase) = obs.MakeField (propertyExpr, initialValue)
+let mkField<'T> propertyExpr
+                (initialValue: 'T)
+                (obs: NotifyBase) =
+                
+    obs.MakeField (propertyExpr, initialValue)
 
-let mkDerivedField<'T> propertyExpr precedingFields generateValue (obs: NotifyBase) =
+
+let mkDerivedField<'T> propertyExpr
+                       precedingFields
+                       generateValue
+                       (obs: NotifyBase) =
+
         obs.MakeDerivedField<'T>(propertyExpr, precedingFields, generateValue)
+
 
 let mkCommand<'T> canExecuteHandler executeHandler (notifyOnFieldUpdate: IFieldBacker list) (obs: NotifyBase) =
     
     obs.MakeCommand<'T> (canExecuteHandler, executeHandler, notifyOnFieldUpdate)
 
-let mkAsyncCommand<'T> canExecuteHandler executeHandler (notifyOnFieldUpdate: IFieldBacker list) (obs: NotifyBase) =
 
-    obs.MakeAsyncCommand<'T> (canExecuteHandler, executeHandler, notifyOnFieldUpdate)
+let mkAsyncCommand<'TInput, 'TOutput> canExecuteHandler
+                                      executeHandler
+                                      onDone
+                                      onException
+                                      onCancelled
+                                      getCancellationToken 
+                                      (notifyOnFieldUpdate: IFieldBacker list)
+                                      (obs: NotifyBase) =
+
+    obs.MakeAsyncCommand<'TInput, 'TOutput> (canExecuteHandler, executeHandler,
+        onDone, onException, onCancelled, getCancellationToken, notifyOnFieldUpdate)
+
 
 let notifyAllChanged (obs: NotifyBase) = obs.NotifyPropertyChanged ""
+
+let ignoreContinuation<'TInput, 'TOutput> (_in : 'TInput) = Unchecked.defaultof<'TOutput>

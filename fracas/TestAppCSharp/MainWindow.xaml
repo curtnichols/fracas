@@ -21,6 +21,10 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="4"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="4"/>
         </Grid.RowDefinitions>
 
         <Label Grid.Column="4" HorizontalAlignment="Left">ViewModel Requested</Label>
@@ -58,8 +62,23 @@
         <Button Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center" Content="Reset Pan"
                 Command="{Binding ResetPanCommand}"/>
 
-        <Button Grid.Row="5" Grid.Column="6" HorizontalAlignment="Center" Content="Slow Async Command" MinHeight="24"
+        <Button Grid.Row="5" Grid.Column="6" HorizontalAlignment="Center" Content="Slow Async Command"
+                MinHeight="24"
                 Command="{Binding SlowAsyncCommand}"
                 IsEnabled="{Binding SlowAsyncCommand.IsNotExecuting}"/>
+
+        <Button Grid.Row="6" Grid.Column="4" HorizontalAlignment="Center"
+                MinHeight="24" Content="Command w/Exception"
+                Command="{Binding AsyncExceptionCommand}"
+                IsEnabled="{Binding AsyncExceptionCommand.IsNotExecuting}"/>
+
+        <Button Grid.Row="6" Grid.Column="8" HorizontalAlignment="Center"
+                MinHeight="24" Content="Cancelled Command"
+                Command="{Binding AsyncCancelledCommand}"
+                IsEnabled="{Binding AsyncCancelledCommand.IsNotExecuting}"/>
+
+        <TextBlock Grid.Row="8" Grid.Column="4" Grid.ColumnSpan="5"
+                   TextWrapping="Wrap" TextAlignment="Center"
+                   Text="{Binding ErrorRecoveryText}"/>
     </Grid>
 </Window>
