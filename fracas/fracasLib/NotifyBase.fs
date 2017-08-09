@@ -204,19 +204,26 @@ and AsyncCommandBacker<'TInput, 'TOutput>(canExecuteHandler: 'TInput option -> b
 
         member __.Execute parameter =
 
-            let clearIsExecuting _ = setIsExecuting false
-            let localOnDone v = onDone v
-                                clearIsExecuting()
-            let localOnException exn = onException exn
-                                       clearIsExecuting()
-            let localOnCancelled cexn = onCancelled cexn
-                                        clearIsExecuting()
+            let wrappedOnDone value = try
+                                          onDone value
+                                      finally
+                                          setIsExecuting false
+
+            let wrappedOnException exn = try
+                                             onException exn
+                                         finally
+                                             setIsExecuting false
+
+            let wrappedOnCancelled cexn = try
+                                              onCancelled cexn
+                                          finally
+                                              setIsExecuting false
 
             setIsExecuting true
             try
                 Async.StartWithContinuations(
                     executeHandler (objParameterToTypedParameter parameter),
-                    localOnDone, localOnException, localOnCancelled,
+                    wrappedOnDone, wrappedOnException, wrappedOnCancelled,
                     ?cancellationToken = getCancellationToken())
             with
                 _ -> setIsExecuting false
