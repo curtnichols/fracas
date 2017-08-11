@@ -11,7 +11,8 @@ namespace TestAppCSharp
         {
             InitializeComponent();
 
-            var vm = new ViewModel(new Model(volume: 0.0, pan: 0.0));
+            var initialSettings = new AudioSettings(volume: 0.0, pan: 0.0);
+            var vm = new ViewModel(new Model(initialSettings));
             DataContext = vm;
         }
     }

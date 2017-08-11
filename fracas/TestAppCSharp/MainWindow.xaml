@@ -1,7 +1,7 @@
 ﻿<Window x:Class="TestAppCSharp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="240" MinHeight="240" Width="640" MinWidth="640">
+        Title="TestAppCSharp" Height="240" MinHeight="240" Width="640" MinWidth="640">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -62,7 +62,39 @@
         <Button Grid.Row="4" Grid.Column="2" HorizontalAlignment="Center" Content="Reset Pan"
                 Command="{Binding ResetPanCommand}"/>
 
-        <Button Grid.Row="5" Grid.Column="6" HorizontalAlignment="Center" Content="Slow Async Command"
+        <!-- Group the command test buttons in a Grid so as to be able to disable them
+             all at once. -->
+        <Grid Grid.Row="5" Grid.Column="4" Grid.ColumnSpan="5" Grid.RowSpan="2"
+              IsEnabled="{Binding IsNotRunningACommand}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" Content="Slow Async Command"
+                MinHeight="24"
+                Command="{Binding SlowAsyncCommand}"
+                IsEnabled="{Binding SlowAsyncCommand.IsNotExecuting}"/>
+
+            <Button Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center"
+                MinHeight="24" Content="Command w/Exception"
+                Command="{Binding AsyncExceptionCommand}"
+                IsEnabled="{Binding AsyncExceptionCommand.IsNotExecuting}"/>
+
+            <Button Grid.Row="61" Grid.Column="4" HorizontalAlignment="Center"
+                MinHeight="24" Content="Cancelled Command"
+                Command="{Binding AsyncCancelledCommand}"
+                IsEnabled="{Binding AsyncCancelledCommand.IsNotExecuting}"/>
+        </Grid>
+
+        <!--<Button Grid.Row="5" Grid.Column="6" HorizontalAlignment="Center" Content="Slow Async Command"
                 MinHeight="24"
                 Command="{Binding SlowAsyncCommand}"
                 IsEnabled="{Binding SlowAsyncCommand.IsNotExecuting}"/>
@@ -75,7 +107,7 @@
         <Button Grid.Row="6" Grid.Column="8" HorizontalAlignment="Center"
                 MinHeight="24" Content="Cancelled Command"
                 Command="{Binding AsyncCancelledCommand}"
-                IsEnabled="{Binding AsyncCancelledCommand.IsNotExecuting}"/>
+                IsEnabled="{Binding AsyncCancelledCommand.IsNotExecuting}"/>-->
 
         <TextBlock Grid.Row="8" Grid.Column="4" Grid.ColumnSpan="5"
                    TextWrapping="Wrap" TextAlignment="Center"

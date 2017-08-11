@@ -27,16 +27,24 @@ type ViewModel(model: Model) as self =
                                                    (fun _ -> self.RequestedPan <- 0.0)
                                                    [requestedPan]
 
-    let asyncTestFunc f _ = async { do! async { self.ErrorRecoveryText <- "Running..." }
+    let asyncTestFunc f _ = async { self.IsRunningACommand <- true
+                                    do! async { self.ErrorRecoveryText <- "Running..." }
                                     do! f }
+
+    let cleanUp result = self.IsRunningACommand <- false
+                         result
+
+    let isRunningACommand = self |> fracas.mkField <@ self.IsRunningACommand @> false
+    let isNotRunningACommand = self |> fracas.mkDerivedField <@ self.IsNotRunningACommand @>
+                                            [ isRunningACommand ] (fun () -> not isRunningACommand.Value)
 
     let slowAsyncCommand =
         self |>
         fracas.mkAsyncCommand (fun _ -> true)
                               (asyncTestFunc (Async.Sleep(2000)))
-                              (fun _ -> self.ErrorRecoveryText <- "Done.")
-                              (fun exn -> self.ErrorRecoveryText <- sprintf "Exception: %s" exn.Message)
-                              (fun cexn -> self.ErrorRecoveryText <- sprintf "Exception: %s" cexn.Message)
+                              ((fun _ -> self.ErrorRecoveryText <- "Done.") >> cleanUp)
+                              ((fun exn -> self.ErrorRecoveryText <- sprintf "Exception: %s" exn.Message) >> cleanUp)
+                              ((fun cexn -> self.ErrorRecoveryText <- sprintf "Exception: %s" cexn.Message) >> cleanUp)
                               (fun _ -> None)
                               []
 
@@ -46,9 +54,9 @@ type ViewModel(model: Model) as self =
                               (asyncTestFunc (async {
                                 do! Async.Sleep(1000)
                                 failwith "async cmd with exception" }))
-                              (fun _ -> self.ErrorRecoveryText <- "Done.")
-                              (fun exn -> self.ErrorRecoveryText <- sprintf "Exception: %s" exn.Message)
-                              (fun cexn -> self.ErrorRecoveryText <- sprintf "Exception: %s" cexn.Message)
+                              ((fun _ -> self.ErrorRecoveryText <- "Done.") >> cleanUp)
+                              ((fun exn -> self.ErrorRecoveryText <- sprintf "Exception: %s" exn.Message) >> cleanUp)
+                              ((fun cexn -> self.ErrorRecoveryText <- sprintf "Exception: %s" cexn.Message) >> cleanUp)
                               (fun _ -> None)
                               []
 
@@ -67,9 +75,9 @@ type ViewModel(model: Model) as self =
                                 do! Async.Sleep(20 * 1000)
                                 do! async { self.ErrorRecoveryText <- "Done!?" }
                               }))
-                              (fun _ -> self.ErrorRecoveryText <- "Done.")
-                              (fun exn -> self.ErrorRecoveryText <- sprintf "Exception: %s" exn.Message)
-                              (fun cexn -> self.ErrorRecoveryText <- sprintf "Exception: %s" cexn.Message)
+                              ((fun _ -> self.ErrorRecoveryText <- "Done.") >> cleanUp)
+                              ((fun exn -> self.ErrorRecoveryText <- sprintf "Exception: %s" exn.Message) >> cleanUp)
+                              ((fun cexn -> self.ErrorRecoveryText <- sprintf "Exception: %s" cexn.Message) >> cleanUp)
                               getCancellationTokenWithTimeout
                               []
 
@@ -85,6 +93,13 @@ type ViewModel(model: Model) as self =
     member x.AsyncExceptionCommand with get() = asyncExceptionCommand.ICommand
 
     member x.AsyncCancelledCommand with get() = asyncCancelledCommand.ICommand
+
+    member x.IsRunningACommand
+        with get() = isRunningACommand.Value
+        and private set newValue = isRunningACommand.Value <- newValue
+
+    member x.IsNotRunningACommand
+        with get() = isNotRunningACommand.Value
 
     // EXAMPLE: makes use of backing fields to implement properties with notifications.
     member x.IsVolumeConstrained

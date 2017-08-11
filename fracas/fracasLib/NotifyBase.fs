@@ -44,7 +44,7 @@ type NotifyBase() =
         new DerivedFieldBacker<'T>(__, propertyExpr, precedingFields, generateValue)
 
     member internal __.MakeCommand<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate,
-                                       ?cancellationToken) =
+                                       ?_cancellationToken) =
         CommandBacker<'T>(canExecuteHandler, executeHandler, notifyOnFieldUpdate)
 
     member internal __.MakeAsyncCommand<'TInput, 'TOutput>(canExecuteHandler,
@@ -123,11 +123,6 @@ and CommandBacker<'T>(canExecuteHandler: 'T option -> bool,
 
     let canExecuteChanged = Event<_, _>()
     let mutable isExecuting = false
-
-    let setIsExecuting value =
-        isExecuting <- value
-        self.NotifyPropertyChanged("IsExecuting")
-        self.NotifyPropertyChanged("IsNotExecuting")
 
     do
         let notifyUpdate = fun _ -> self.NotifyCanExecuteChanged()
