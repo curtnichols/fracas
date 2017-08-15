@@ -1,5 +1,9 @@
 # RevisionHistory
 
+## fracas 0.8
+
+* adds continuations for async commands.
+
 ## fracas 0.7
 
 * adds asynchronous commands via mkAsyncCommand.
