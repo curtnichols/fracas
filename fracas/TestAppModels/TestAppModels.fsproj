@@ -9,8 +9,8 @@
     <OutputType>Library</OutputType>
     <RootNamespace>TestAppModels</RootNamespace>
     <AssemblyName>TestAppModels</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFSharpCoreVersion>4.4.1.0</TargetFSharpCoreVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFSharpCoreVersion>4.4.3.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Name>TestAppModels</Name>
     <TargetFrameworkProfile />
@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Model.fs" />
     <Compile Include="ViewModel.fs" />
+    <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -65,13 +66,14 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.ValueTuple">
-      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\fracasDesktop\fracasDesktop.fsproj">
-      <Name>fracasDesktop</Name>
-      <Project>{7a25b219-c975-4551-a9a6-25a225ab483f}</Project>
+    <ProjectReference Include="..\fracas.standard\fracas.standard.fsproj">
+      <Name>fracas.standard</Name>
+      <Project>{de266ea7-5cda-4685-b9eb-dfdc3a944335}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
