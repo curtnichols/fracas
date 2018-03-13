@@ -1,5 +1,10 @@
 # RevisionHistory
 
+## fracas 1.0
+
+* moved to .NET Standard implementation; you may be forced into 4.7.1 if you're using desktop .NET.
+* updates F# and `System.ValueTuple` dependencies.
+
 ## fracas 0.8
 
 * adds continuations for async commands.
