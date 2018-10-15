@@ -66,11 +66,8 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.ValueTuple">
-      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
       <Private>True</Private>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\fracas.standard\fracas.standard.fsproj">
       <Name>fracas.standard</Name>
       <Project>{de266ea7-5cda-4685-b9eb-dfdc3a944335}</Project>
