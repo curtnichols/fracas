@@ -10,7 +10,7 @@
     <RootNamespace>fracasDesktop</RootNamespace>
     <AssemblyName>fracasDesktop</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFSharpCoreVersion>4.4.1.0</TargetFSharpCoreVersion>
+    <TargetFSharpCoreVersion>4.4.3.0</TargetFSharpCoreVersion>
     <Name>fracasDesktop</Name>
     <TargetFrameworkProfile />
   </PropertyGroup>
