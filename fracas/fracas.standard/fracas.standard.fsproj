@@ -5,18 +5,18 @@
     <TargetFSharpCoreVersion>4.4.3.0</TargetFSharpCoreVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>fracas</PackageId>
-    <Version>1.0.2-beta</Version>
+    <Version>1.0.3-beta</Version>
     <Authors>Curt Nichols</Authors>
     <Company />
     <Product>fracas</Product>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/curtnichols/fracas</PackageProjectUrl>
     <Description>Minimalist MVVM Support Library for F#</Description>
-    <Copyright>Copyright 2013-2018 Curt Nichols</Copyright>
+    <Copyright>Copyright 2013-2019 Curt Nichols</Copyright>
     <PackageTags>F#, MVVM</PackageTags>
-    <AssemblyVersion>1.0.2.0</AssemblyVersion>
-    <FileVersion>1.0.2.0</FileVersion>
-    <PackageReleaseNotes>This is a breaking build in order to build with .NET Standard. You may be forced to desktop .NET 4.7.1.</PackageReleaseNotes>
+    <AssemblyVersion>1.0.3.0</AssemblyVersion>
+    <FileVersion>1.0.3.0</FileVersion>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
