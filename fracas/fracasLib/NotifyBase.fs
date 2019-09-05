@@ -16,7 +16,8 @@ module private NotifyBaseImpl =
 
         match propertyExpr with
         | PropertyGet(_, propOrValInfo, _) -> propOrValInfo.Name
-        | _ -> failwith "Unexpected expression type; needs PropertyGet"
+        | _ ->
+            invalidArg "propertyExpr" "The expression needs to represent a property"
 
 
 type IFieldBacker =
@@ -32,7 +33,7 @@ type ICommandWithExtras =
 type NotifyBase() =
 
     let propertyChanged = Event<_, _>()
-    
+
     interface INotifyPropertyChanged with
         [<CLIEvent>]
         member __.PropertyChanged = propertyChanged.Publish
@@ -73,7 +74,7 @@ and FieldBacker<'T>(om: NotifyBase, propertyExpr, initialValue: 'T option) =
 
     let setValue newValue =
         if Object.Equals(value, newValue) then false
-        else 
+        else
             value <- newValue
             om.NotifyPropertyChanged(propertyName)
             internalUpdateEvent.Trigger newValue
@@ -87,7 +88,7 @@ and FieldBacker<'T>(om: NotifyBase, propertyExpr, initialValue: 'T option) =
     member __.Set newValue = setValue newValue
 
     interface IFieldBacker with
-        member __.Updated: IEvent<obj> = 
+        member __.Updated: IEvent<obj> =
             internalUpdateEvent.Publish
 
     member internal x.Updated = (x :> IFieldBacker).Updated
@@ -110,7 +111,7 @@ and DerivedFieldBacker<'T>(om: NotifyBase, propertyExpr, precedingFields, genera
         with get() : 'T = generateValue()
 
     interface IFieldBacker with
-        member __.Updated: IEvent<obj> = 
+        member __.Updated: IEvent<obj> =
             internalUpdateEvent.Publish
 
     member internal x.Updated = (x :> IFieldBacker).Updated
@@ -233,12 +234,12 @@ and AsyncCommandBacker<'TInput, 'TOutput>(canExecuteHandler: 'TInput option -> b
 
     member self.NotifyCanExecuteChanged() = canExecuteChanged.Trigger(self, EventArgs.Empty)
 
-// Functions
+// Functions that make fields, commands, etc.
 
 let mkField<'T> propertyExpr
                 (initialValue: 'T)
                 (obs: NotifyBase) =
-                
+
     obs.MakeField (propertyExpr, initialValue)
 
 
@@ -251,7 +252,7 @@ let mkDerivedField<'T> propertyExpr
 
 
 let mkCommand<'T> canExecuteHandler executeHandler (notifyOnFieldUpdate: IFieldBacker list) (obs: NotifyBase) =
-    
+
     obs.MakeCommand<'T> (canExecuteHandler, executeHandler, notifyOnFieldUpdate)
 
 
@@ -260,7 +261,7 @@ let mkAsyncCommand<'TInput, 'TOutput> canExecuteHandler
                                       onDone
                                       onException
                                       onCancelled
-                                      getCancellationToken 
+                                      getCancellationToken
                                       (notifyOnFieldUpdate: IFieldBacker list)
                                       (obs: NotifyBase) =
 
