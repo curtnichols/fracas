@@ -5,7 +5,7 @@
     <TargetFSharpCoreVersion>4.4.3.0</TargetFSharpCoreVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>fracas</PackageId>
-    <Version>1.0.3-beta</Version>
+    <Version>1.0.4-beta</Version>
     <Authors>Curt Nichols</Authors>
     <Company />
     <Product>fracas</Product>
@@ -14,8 +14,8 @@
     <Description>Minimalist MVVM Support Library for F#</Description>
     <Copyright>Copyright 2013-2019 Curt Nichols</Copyright>
     <PackageTags>F#, MVVM</PackageTags>
-    <AssemblyVersion>1.0.3.0</AssemblyVersion>
-    <FileVersion>1.0.3.0</FileVersion>
+    <AssemblyVersion>1.0.4.0</AssemblyVersion>
+    <FileVersion>1.0.4.0</FileVersion>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
